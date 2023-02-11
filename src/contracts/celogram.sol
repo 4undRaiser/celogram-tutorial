@@ -2,10 +2,22 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
+interface IERC20Token {
+  function transfer(address, uint256) external returns (bool);
+  function approve(address, uint256) external returns (bool);
+  function transferFrom(address, address, uint256) external returns (bool);
+  function totalSupply() external view returns (uint256);
+  function balanceOf(address) external view returns (uint256);
+  function allowance(address, address) external view returns (uint256);
+  event Transfer(address indexed from, address indexed to, uint256 value);
+  event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
 
 contract Celogram{
 
 uint private postLength = 0;
+address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
     struct Post{
         address user;
@@ -72,8 +84,19 @@ uint private postLength = 0;
          );
     }
 
+    function sendTip(uint _index, uint _ammount) public payable  {
+        require(
+          IERC20Token(cUsdTokenAddress).transferFrom(
+             msg.sender,
+             posts[_index].user,
+             _ammount
+          ),
+          "Transfer failed."
+        );
+    }
 
     function getPostsLength() public view returns(uint){
         return(postLength);
-    }
+    }     
+
 }
